@@ -1,10 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr" xmlns="http://www.w3.org/1999/xhml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torrent Uploader</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
+<div class="container">
+    <div class="form-container">
+        <h2>Torrent uploader</h2>
+        <form method="post" th:action="@{/upload}" th:object="${fileToUpload}" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="torrentFile" class="form-label">Fichier .torrent</label>
+                <input class="form-control" type="file" id="torrentFile" accept=".torrent" th:field="*{file}">
+            </div>
+            <div class="mb-3">
+                <label for="watchFolder" class="form-label">Répertoire de destination</label>
+                <select class="form-select" id="watchFolder" th:field="*{destinationFolder}">
+                    <option value="">.</option>
+                    <option th:each="folder : ${watchFolders}" th:value="${folder}" th:text="${folder}"></option>
+                </select>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Upload torrent</button>
+            </div>
+        </form>
+    </div>
+</div>
 
+<span th:if="${msg != null}" th:text="${msg}"></span>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

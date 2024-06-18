@@ -1,13 +1,12 @@
 package fr.robate.torrentuploader.model;
 
 import lombok.Data;
-
-import java.io.File;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class FileToUpload {
 
     String destinationFolder;
 
-    File file;
+    MultipartFile file;
 }

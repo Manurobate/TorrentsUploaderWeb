@@ -11,7 +11,7 @@ public class FtpProperties {
 
     String host;
 
-    String port;
+    int port;
 
     String user;
 
