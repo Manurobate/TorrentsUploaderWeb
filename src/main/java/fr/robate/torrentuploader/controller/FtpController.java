@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -38,23 +39,27 @@ public class FtpController {
     }
 
     @PostMapping("/upload")
-    public ModelAndView uploadTorrent(Model model, @ModelAttribute FileToUpload file) {
+    public ModelAndView uploadTorrent(Model model, @ModelAttribute FileToUpload fileToUpload) {
 
+        List<MultipartFile> files = fileToUpload.getFiles();
+        StringBuilder message = new StringBuilder();
 
-        String filename = file.getFile().getOriginalFilename();
+        for (MultipartFile file : files) {
+            String filename = file.getOriginalFilename();
 
-        if (filename.toLowerCase().endsWith(".torrent")) {
-            try {
-                ftpService.uploadFichier(file.getFile(), file.getDestinationFolder());
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
+            if (filename.toLowerCase().endsWith(".torrent")) {
+                try {
+                    ftpService.uploadFichier(file, fileToUpload.getDestinationFolder());
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+                message.append("Fichier uploadé : ").append(filename).append("<br>");
+            } else {
+                message.append("Fichier non torrent : ").append(filename).append("<br>");
             }
-            model.addAttribute("msg", "Fichier uploadé : " + filename);
-        } else {
-            model.addAttribute("msg", "Fichier doit etre .torrent");
         }
 
-
+        model.addAttribute("msg", message.toString());
         return new ModelAndView("redirect:/");
     }
 }
