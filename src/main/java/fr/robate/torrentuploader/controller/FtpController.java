@@ -1,8 +1,8 @@
 package fr.robate.torrentuploader.controller;
 
-import fr.robate.torrentuploader.Exception.FtpException;
 import fr.robate.torrentuploader.model.FileToUpload;
 import fr.robate.torrentuploader.service.FtpService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Controller
 public class FtpController {
 
@@ -22,25 +22,33 @@ public class FtpController {
 
 
     @GetMapping("/")
-    public String displayIndex(Model model) throws FtpException {
+    public String displayIndex(Model model) {
 
         FileToUpload fileModel = new FileToUpload();
         model.addAttribute("fileToUpload", fileModel);
 
-        List<String> watchFolders = ftpService.listDirectoriesInWatchFolder();
-        model.addAttribute("watchFolders", watchFolders);
+        try {
+            List<String> watchFolders = ftpService.listDirectoriesInWatchFolder();
+            model.addAttribute("watchFolders", watchFolders);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
 
         return "index";
     }
 
     @PostMapping("/upload")
-    public ModelAndView uploadTorrent(Model model, @ModelAttribute FileToUpload file) throws FtpException, IOException {
+    public ModelAndView uploadTorrent(Model model, @ModelAttribute FileToUpload file) {
 
-        
+
         String filename = file.getFile().getOriginalFilename();
 
         if (filename.toLowerCase().endsWith(".torrent")) {
-            ftpService.uploadFichier(file.getFile(), file.getDestinationFolder());
+            try {
+                ftpService.uploadFichier(file.getFile(), file.getDestinationFolder());
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
             model.addAttribute("msg", "Fichier uploadé : " + filename);
         } else {
             model.addAttribute("msg", "Fichier doit etre .torrent");

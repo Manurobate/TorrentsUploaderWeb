@@ -1,6 +1,6 @@
 package fr.robate.torrentuploader.service;
 
-import fr.robate.torrentuploader.Exception.FtpException;
+import fr.robate.torrentuploader.Exception.*;
 import fr.robate.torrentuploader.configuration.FtpProperties;
 import fr.robate.torrentuploader.repository.FtpsRepository;
 import lombok.Data;
@@ -23,7 +23,7 @@ public class FtpService {
     @Autowired
     private FtpsRepository ftpsRepository;
 
-    public List<String> listDirectoriesInWatchFolder() throws FtpException {
+    public List<String> listDirectoriesInWatchFolder() throws NetworkError, NoConnection, LoginDenied, ListingFailed {
 
         ftpsRepository.connect(props.getHost(), props.getPort(), props.getUser(), props.getPassword());
 
@@ -39,7 +39,7 @@ public class FtpService {
         return directoryNames;
     }
 
-    public void uploadFichier(MultipartFile file, String destFolder) throws FtpException, IOException {
+    public void uploadFichier(MultipartFile file, String destFolder) throws IOException, NetworkError, NoConnection, LoginDenied, UploadFailed, IncorrectFile, DirectoryNotFound {
         ftpsRepository.connect(props.getHost(), props.getPort(), props.getUser(), props.getPassword());
 
         ftpsRepository.uploadFile(file.getInputStream(), "watch/" + destFolder, file.getOriginalFilename());
