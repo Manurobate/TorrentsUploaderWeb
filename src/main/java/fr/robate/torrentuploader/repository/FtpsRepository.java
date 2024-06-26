@@ -31,8 +31,9 @@ public class FtpsRepository {
             if (!isLogged)
                 throw new FtpException("Authentication error with user " + user);
 
-            ftpsClient.execPBSZ(0);
             ftpsClient.execPROT("P");
+            ftpsClient.setFileType(FTPSClient.BINARY_FILE_TYPE);
+            ftpsClient.setFileTransferMode(FTPSClient.STREAM_TRANSFER_MODE);
             ftpsClient.enterLocalPassiveMode();
         } catch (IOException e) {
             throw new FtpException("Network error during connection", e);
@@ -64,7 +65,7 @@ public class FtpsRepository {
 
         try {
             ftpsClient.changeWorkingDirectory(path);
-            
+
             return ftpsClient.listDirectories();
         } catch (IOException e) {
             throw new FtpException("Error during directory listing", e);
