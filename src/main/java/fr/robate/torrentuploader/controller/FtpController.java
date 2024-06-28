@@ -22,11 +22,6 @@ public class FtpController {
     @Autowired
     private FtpService ftpService;
 
-    @GetMapping("/testerror")
-    public ModelAndView testError() {
-        return new ModelAndView("redirect:/");
-    }
-
     @GetMapping("/")
     public String displayIndex(Model model) {
 
