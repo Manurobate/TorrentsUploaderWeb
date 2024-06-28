@@ -1,7 +1,7 @@
 package fr.robate.torrentuploader.service;
 
-import fr.robate.torrentuploader.Exception.*;
 import fr.robate.torrentuploader.configuration.FtpProperties;
+import fr.robate.torrentuploader.exception.*;
 import fr.robate.torrentuploader.repository.FtpsRepository;
 import lombok.Data;
 import org.apache.commons.net.ftp.FTPFile;

@@ -1,6 +1,6 @@
 package fr.robate.torrentuploader.repository;
 
-import fr.robate.torrentuploader.Exception.*;
+import fr.robate.torrentuploader.exception.*;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;

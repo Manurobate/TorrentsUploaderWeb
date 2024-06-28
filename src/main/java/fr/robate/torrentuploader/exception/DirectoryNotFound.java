@@ -1,6 +1,9 @@
-package fr.robate.torrentuploader.Exception;
+package fr.robate.torrentuploader.exception;
+
+import java.io.Serial;
 
 public class DirectoryNotFound extends Exception {
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

@@ -1,4 +1,4 @@
-package fr.robate.torrentuploader.Exception;
+package fr.robate.torrentuploader.exception;
 
 public class UploadFailed extends Exception {
     private static final long serialVersionUID = 1L;
