@@ -20,10 +20,11 @@ public class FtpService {
     @Autowired
     private FtpProperties props;
 
-    @Autowired
     private FtpsRepository ftpsRepository;
 
     public List<String> listDirectoriesInWatchFolder() throws NetworkError, NoConnection, LoginDenied, ListingFailed {
+
+        ftpsRepository = new FtpsRepository();
 
         ftpsRepository.connect(props.getHost(), props.getPort(), props.getUser(), props.getPassword());
 
@@ -40,6 +41,8 @@ public class FtpService {
     }
 
     public void uploadFichier(MultipartFile file, String destFolder) throws IOException, NetworkError, NoConnection, LoginDenied, UploadFailed, IncorrectFile, DirectoryNotFound {
+        ftpsRepository = new FtpsRepository();
+
         ftpsRepository.connect(props.getHost(), props.getPort(), props.getUser(), props.getPassword());
 
         ftpsRepository.uploadFile(file.getInputStream(), "watch/" + destFolder, file.getOriginalFilename());
