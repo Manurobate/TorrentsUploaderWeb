@@ -27,7 +27,6 @@ public class FtpController {
 
         FileToUpload fileModel = new FileToUpload();
         model.addAttribute("fileToUpload", fileModel);
-        model.addAttribute("msg", "Test Erreur");
 
         try {
             List<String> watchFolders = ftpService.listDirectoriesInWatchFolder();
@@ -59,7 +58,6 @@ public class FtpController {
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
-                message.append("Fichier envoyé : ").append(filename).append("<br>");
             } else {
                 message.append("Fichier non torrent : ").append(filename).append("<br>");
             }
