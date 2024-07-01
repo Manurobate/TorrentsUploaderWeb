@@ -41,8 +41,11 @@ jobs:
         run: mvn package -DskipTests
 
       - name: SonarQube Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONARQUBE_URL: ${{ secrets.SONAR_HOST_URL }
         run: |
           mvn sonar:sonar \
-          -Dsonar.projectKey=my-spring-boot-app \
+          -Dsonar.projectKey=Torrents-Uploader-Web \
           -Dsonar.host.url=${{ secrets.SONARQUBE_URL }} \
           -Dsonar.login=${{ secrets.SONARQUBE_TOKEN }}
