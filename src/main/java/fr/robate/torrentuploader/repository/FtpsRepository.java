@@ -1,6 +1,7 @@
 package fr.robate.torrentuploader.repository;
 
 import fr.robate.torrentuploader.exception.*;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @Slf4j
+@Data
 @Repository
 public class FtpsRepository {
 

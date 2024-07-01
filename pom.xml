@@ -43,6 +43,25 @@
             <artifactId>commons-net</artifactId>
             <version>3.11.1</version>
         </dependency>
+        <!-- Apache FtpServer with explicit FTPS support -->
+        <dependency>
+            <groupId>org.apache.ftpserver</groupId>
+            <artifactId>ftpserver-core</artifactId>
+            <version>1.1.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.mina</groupId>
+            <artifactId>mina-core</artifactId>
+            <version>2.0.16</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.64</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
