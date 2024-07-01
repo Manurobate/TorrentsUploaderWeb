@@ -39,3 +39,10 @@ jobs:
   
       - name: Package the application
         run: mvn package -DskipTests
+
+      - name: SonarQube Scan
+        run: |
+          mvn sonar:sonar \
+          -Dsonar.projectKey=my-spring-boot-app \
+          -Dsonar.host.url=${{ secrets.SONARQUBE_URL }} \
+          -Dsonar.login=${{ secrets.SONARQUBE_TOKEN }}
