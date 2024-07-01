@@ -1,6 +1,8 @@
 package fr.robate.torrentuploader.repository;
 
-import fr.robate.torrentuploader.Exception.*;
+import fr.robate.torrentuploader.exception.*;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.io.InputStream;
 
+@Slf4j
+@Data
 @Repository
 public class FtpsRepository {
 
@@ -19,22 +23,30 @@ public class FtpsRepository {
     public void connect(String host, int port, String user, String password) throws NoConnection, LoginDenied, NetworkError {
         ftpsClient = new FTPSClient(false);
 
+        log.debug("Connecting to {}:{}", host, port);
+
         try {
             ftpsClient.connect(host, port);
             isConnected = FTPReply.isPositiveCompletion(ftpsClient.getReplyCode());
 
             if (!isConnected)
                 throw new NoConnection("Error while connecting to host " + host + ":" + port);
+            else
+                log.debug("Connected to {}:{}", host, port);
 
             isLogged = ftpsClient.login(user, password);
 
             if (!isLogged)
                 throw new LoginDenied("Authentication error with user " + user);
+            else
+                log.debug("Logged into {}:{} with user {}", host, port, user);
 
             ftpsClient.execPROT("P");
             ftpsClient.setFileType(FTPSClient.BINARY_FILE_TYPE);
             ftpsClient.setFileTransferMode(FTPSClient.STREAM_TRANSFER_MODE);
             ftpsClient.enterLocalPassiveMode();
+
+            log.debug("Settings ok");
         } catch (IOException e) {
             throw new NetworkError("Network error during connection", e);
         }
@@ -42,12 +54,15 @@ public class FtpsRepository {
 
     public void disconnect() throws NetworkError {
         try {
+            log.debug("Disconnecting");
+
             ftpsClient.logout();
             isLogged = false;
+            log.debug("Logged out");
 
             ftpsClient.disconnect();
             isConnected = false;
-
+            log.debug("Disconnected");
         } catch (IOException e) {
             throw new NetworkError("Error during disconnecting", e);
         }
@@ -63,6 +78,8 @@ public class FtpsRepository {
     public FTPFile[] listDirectories(String path) throws NoConnection, LoginDenied, ListingFailed {
         checkIfConnectedAndLogged();
 
+        log.debug("Listing directories");
+
         try {
             ftpsClient.changeWorkingDirectory(path);
 
@@ -75,6 +92,8 @@ public class FtpsRepository {
     public void uploadFile(InputStream file, String storingPath, String fileName) throws NoConnection, LoginDenied, UploadFailed, IncorrectFile, DirectoryNotFound {
         checkIfConnectedAndLogged();
 
+        log.debug("Uploading file {}", fileName);
+
         try {
             ftpsClient.changeWorkingDirectory(storingPath);
         } catch (IOException e) {
@@ -85,9 +104,10 @@ public class FtpsRepository {
             throw new IncorrectFile("Error InputStream is null");
 
         try {
-            if (ftpsClient.storeFile(fileName, file))
+            if (ftpsClient.storeFile(fileName, file)) {
                 file.close();
-            else
+                log.debug("Upload ok");
+            } else
                 throw new UploadFailed("Error during file storing");
         } catch (IOException e) {
             throw new UploadFailed("Error during file uploading", e);

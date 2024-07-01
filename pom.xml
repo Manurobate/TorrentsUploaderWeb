@@ -10,7 +10,7 @@
     </parent>
     <groupId>fr.robate</groupId>
     <artifactId>torrentUploader</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.9.0-SNAPSHOT</version>
     <name>torrentUploader</name>
     <description>torrentUploader</description>
     <properties>
@@ -42,6 +42,25 @@
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
             <version>3.11.1</version>
+        </dependency>
+        <!-- Apache FtpServer with explicit FTPS support -->
+        <dependency>
+            <groupId>org.apache.ftpserver</groupId>
+            <artifactId>ftpserver-core</artifactId>
+            <version>1.1.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.mina</groupId>
+            <artifactId>mina-core</artifactId>
+            <version>2.0.16</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.64</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

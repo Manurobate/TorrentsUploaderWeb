@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -21,12 +22,12 @@ public class FtpController {
     @Autowired
     private FtpService ftpService;
 
-
     @GetMapping("/")
     public String displayIndex(Model model) {
 
         FileToUpload fileModel = new FileToUpload();
         model.addAttribute("fileToUpload", fileModel);
+        model.addAttribute("msg", "Test Erreur");
 
         try {
             List<String> watchFolders = ftpService.listDirectoriesInWatchFolder();
@@ -39,7 +40,7 @@ public class FtpController {
     }
 
     @PostMapping("/upload")
-    public ModelAndView uploadTorrent(Model model, @ModelAttribute FileToUpload fileToUpload) {
+    public ModelAndView uploadTorrent(RedirectAttributes redirectAttributes, @ModelAttribute FileToUpload fileToUpload) {
 
         List<MultipartFile> files = fileToUpload.getFiles();
         StringBuilder message = new StringBuilder();
@@ -47,19 +48,26 @@ public class FtpController {
         for (MultipartFile file : files) {
             String filename = file.getOriginalFilename();
 
+            if (filename == null) {
+                message.append("Nom de fichier null : ").append("<br>");
+                continue;
+            }
+
             if (filename.toLowerCase().endsWith(".torrent")) {
                 try {
                     ftpService.uploadFichier(file, fileToUpload.getDestinationFolder());
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
-                message.append("Fichier uploadé : ").append(filename).append("<br>");
+                message.append("Fichier envoyé : ").append(filename).append("<br>");
             } else {
                 message.append("Fichier non torrent : ").append(filename).append("<br>");
             }
         }
 
-        model.addAttribute("msg", message.toString());
+        if (!message.isEmpty())
+            redirectAttributes.addFlashAttribute("msg", message);
+
         return new ModelAndView("redirect:/");
     }
 }
