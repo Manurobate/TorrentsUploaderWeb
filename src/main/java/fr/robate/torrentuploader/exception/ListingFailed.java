@@ -1,14 +1,13 @@
 package fr.robate.torrentuploader.exception;
 
-public class ListingFailed extends Exception {
-    private static final long serialVersionUID = 1L;
+import java.io.Serial;
 
+public class ListingFailed extends Exception {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     public ListingFailed(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public ListingFailed(final String message) {
-        super(message);
-    }
 }

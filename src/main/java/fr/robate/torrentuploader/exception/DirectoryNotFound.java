@@ -10,8 +10,4 @@ public class DirectoryNotFound extends Exception {
     public DirectoryNotFound(final String message, final Throwable cause) {
         super(message, cause);
     }
-
-    public DirectoryNotFound(final String message) {
-        super(message);
-    }
 }
