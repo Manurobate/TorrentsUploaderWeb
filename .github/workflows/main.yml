@@ -42,8 +42,8 @@ jobs:
 
       - name: SonarQube Scan
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONARQUBE_URL: ${{ secrets.SONAR_HOST_URL }
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+          SONARQUBE_URL: ${{ secrets.SONARQUBE_URL }
         run: |
           mvn sonar:sonar \
           -Dsonar.projectKey=Torrents-Uploader-Web \
