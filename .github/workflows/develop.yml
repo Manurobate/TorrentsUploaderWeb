@@ -65,7 +65,7 @@ jobs:
         run: mvn install -DskipTests
 
       - name: Run tests
-        run: mvn test
+        run: timeout 10m mvn test
 
       - name: Package the application
         run: mvn package -DskipTests
