@@ -42,8 +42,8 @@ public class FtpsRepository {
                 log.debug("Logged into {}:{} with user {}", host, port, user);
 
             ftpsClient.execPROT("P");
-            ftpsClient.setFileType(2); // BINARY_FILE_TYPE
-            ftpsClient.setFileTransferMode(10); // STREAM_TRANSFER_MODE
+            ftpsClient.setFileType(FTPSClient.BINARY_FILE_TYPE);
+            ftpsClient.setFileTransferMode(FTPSClient.STREAM_TRANSFER_MODE);
             ftpsClient.enterLocalPassiveMode();
 
             log.debug("Settings ok");
