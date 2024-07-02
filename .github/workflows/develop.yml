@@ -1,4 +1,4 @@
-name: CI/CD Pipeline for push on develop branch
+name: CI/CD Pipeline develop
 
 on:
   push:
