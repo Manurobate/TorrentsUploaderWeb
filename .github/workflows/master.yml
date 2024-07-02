@@ -1,0 +1,140 @@
+name: CI/CD Pipeline for pull request on master branch
+
+on:
+  pull_request:
+    types: [ closed ]
+    branches:
+      - master
+
+jobs:
+  label_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Verify mandatory labels
+        id: label-check
+        run: |
+          MANDATORY_LABELS=("release:major" "release:minor" "release:patch")
+          
+          PR_LABELS=$(jq -r '.pull_request.labels[].name' "$GITHUB_EVENT_PATH")
+          
+          for label in "${MANDATORY_LABELS[@]}"; do
+            if echo "$PR_LABELS" | grep -q "$label"; then
+              echo "Mandatory label $label found"
+              exit 0
+            fi
+          done
+          
+          echo "Error: None of the mandatory labels (${MANDATORY_LABELS[*]}) are present on this pull request."
+          exit 1
+
+  # Build the project after increment_version or release_version
+  build:
+    runs-on: ubuntu-latest
+    needs: release_version
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Install dependencies
+        run: mvn install -DskipTests
+
+      - name: Run tests
+        run: mvn test
+
+      - name: Package the application
+        run: mvn package -DskipTests
+
+  release_version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      # Increment version depending on release type on a pull request
+      - name: Determine Release Version
+        id: determine_version
+        run: |
+          LABELS=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels)
+          if echo "$LABELS" | grep -q "release:major"; then
+            RELEASE_TYPE="major"
+          elif echo "$LABELS" | grep -q "release:minor"; then
+            RELEASE_TYPE="minor"
+          elif echo "$LABELS" | grep -q "release:patch"; then
+            RELEASE_TYPE="patch"
+          else
+            echo "No release label found, defaulting to patch."
+            RELEASE_TYPE="patch"
+          fi
+          echo "Release type: $RELEASE_TYPE"
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          BASE_VERSION=$(echo $CURRENT_VERSION | sed 's/-SNAPSHOT//')
+          IFS='.' read -ra ADDR <<< "$BASE_VERSION"
+          MAJOR=${ADDR[0]}
+          MINOR=${ADDR[1]}
+          PATCH=${ADDR[2]}
+          if [ "$RELEASE_TYPE" == "major" ]; then
+            NEW_VERSION="$((MAJOR + 1)).0.0"
+            NEW_DEV_VERSION="$((MAJOR + 1)).0.1-SNAPSHOT"
+          elif [ "$RELEASE_TYPE" == "minor" ]; then
+            NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
+            NEW_DEV_VERSION="$MAJOR.$((MINOR + 1)).1-SNAPSHOT"
+          elif [ "$RELEASE_TYPE" == "patch" ]; then
+            NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+            NEW_DEV_VERSION="$MAJOR.$MINOR.$((PATCH + 2))-SNAPSHOT"
+          else
+            echo "Invalid release type: $RELEASE_TYPE"
+            exit 1
+          fi
+          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+          echo "new_dev_version=$NEW_DEV_VERSION" >> $GITHUB_ENV
+
+      - name: Perform release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          mvn --batch-mode release:prepare release:perform -DreleaseVersion=$NEW_VERSION -DdevelopmentVersion=$NEW_DEV_VERSION
+          git push origin master --tags
+
+#  docker:
+#    runs-on: ubuntu-latest
+#    needs: build
+
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+
+#      - name: Log in to Docker Hub
+#        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+#     - name: Build Docker image
+#       run: docker build . -t ${{ secrets.DOCKER_HUB_USERNAME }}/my-spring-boot-app:latest
+
+#      - name: Push Docker image
+#        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/my-spring-boot-app:latest

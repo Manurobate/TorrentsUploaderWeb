@@ -1,6 +1,7 @@
 package fr.robate.torrentuploader;
 
 import fr.robate.torrentuploader.configuration.FtpProperties;
+import fr.robate.torrentuploader.exception.NoConnection;
 import fr.robate.torrentuploader.repository.FtpsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTPFile;
@@ -27,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
-public class FtpsRepositoryTest {
+class FtpsRepositoryTest {
     private static FtpServer ftpServer;
 
     @Autowired
@@ -97,7 +98,7 @@ public class FtpsRepositoryTest {
     }
 
     @Test
-    public void testConnectAndDisconnect() {
+    void testConnectAndDisconnect() {
         try {
             ftpsRepository.connect(ftpProperties.getHost(), ftpProperties.getPort(), ftpProperties.getUser(), ftpProperties.getPassword());
             // Assuming there's a method isConnected to check the connection status
@@ -110,7 +111,7 @@ public class FtpsRepositoryTest {
     }
 
     @Test
-    public void testListDirectories() {
+    void testListDirectories() {
 
         String watchDirectory = ftpHomeDir + "/" + ftpProperties.getWatchDirectory();
 
@@ -139,5 +140,16 @@ public class FtpsRepositoryTest {
             e.printStackTrace();
             fail("Exception thrown during listDirectories test: " + e.getMessage());
         }
+    }
+
+    @Test
+    void testListDirectoriesWithoutconnection() {
+        String watchDirectory = ftpHomeDir + "/" + ftpProperties.getWatchDirectory();
+
+        new File(watchDirectory).mkdir();
+
+        Exception exception = assertThrows(NoConnection.class, () -> ftpsRepository.listDirectories(ftpProperties.getWatchDirectory()));
+
+        assertSame(exception.getClass(), NoConnection.class);
     }
 }

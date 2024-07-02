@@ -15,8 +15,8 @@
     <div class="container">
         <div class="form-container">
 
-            <div class="alert alert-danger" role="alert">
-                <span th:if="${msg != null}" th:text="${msg}"></span>
+            <div th:if="${msg != null}" class="alert alert-danger" role="alert">
+                <span th:text="${msg}"></span>
             </div>
 
             <form method="post" th:action="@{/upload}" th:object="${fileToUpload}" enctype="multipart/form-data">
