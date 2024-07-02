@@ -8,7 +8,6 @@ jobs:
   # Build the project after increment_version or release_version
   build:
     runs-on: ubuntu-latest
-    needs: label_check
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
