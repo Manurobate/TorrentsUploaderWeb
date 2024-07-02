@@ -5,6 +5,7 @@ import fr.robate.torrentuploader.exception.*;
 import fr.robate.torrentuploader.repository.FtpsRepository;
 import lombok.Data;
 import org.apache.commons.net.ftp.FTPFile;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,13 +17,10 @@ import java.util.List;
 @Service
 public class FtpService {
 
-    private final FtpProperties props;
+    @Autowired
+    private FtpProperties props;
 
     private FtpsRepository ftpsRepository;
-
-    public FtpService(FtpProperties props) {
-        this.props = props;
-    }
 
     public List<String> listDirectoriesInWatchFolder() throws NetworkError, NoConnection, LoginDenied, ListingFailed {
 
