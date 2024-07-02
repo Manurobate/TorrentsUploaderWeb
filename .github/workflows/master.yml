@@ -1,4 +1,4 @@
-name: CI/CD Pipeline for pull request on master branch
+name: CI/CD Pipeline master
 
 on:
   pull_request:
@@ -33,7 +33,7 @@ jobs:
   # Build the project after increment_version or release_version
   build:
     runs-on: ubuntu-latest
-    needs: release_version
+    needs: label_check
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -63,6 +63,7 @@ jobs:
 
   release_version:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
