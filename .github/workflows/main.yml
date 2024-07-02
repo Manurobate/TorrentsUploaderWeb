@@ -146,7 +146,7 @@ jobs:
           mvn sonar:sonar \
           -Dsonar.projectKey=Torrents-Uploader-Web \
           -Dsonar.host.url=${{ secrets.SONARQUBE_URL }} \
-          -Dsonar.login=${{ secrets.SONARQUBE_TOKEN }} \
+          -Dsonar.token=${{ secrets.SONARQUBE_TOKEN }} \
           -Dsonar.java.binaries=target
 
 #  docker:
