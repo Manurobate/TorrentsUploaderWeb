@@ -3,7 +3,6 @@ package fr.robate.torrentuploader.repository;
 import fr.robate.torrentuploader.exception.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
@@ -43,8 +42,8 @@ public class FtpsRepository {
                 log.debug("Logged into {}:{} with user {}", host, port, user);
 
             ftpsClient.execPROT("P");
-            ftpsClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-            ftpsClient.setFileTransferMode(FTPClient.STREAM_TRANSFER_MODE);
+            ftpsClient.setFileType(2); // BINARY_FILE_TYPE
+            ftpsClient.setFileTransferMode(10); // STREAM_TRANSFER_MODE
             ftpsClient.enterLocalPassiveMode();
 
             log.debug("Settings ok");

@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
-public class FtpsRepositoryTest {
+class FtpsRepositoryTest {
     private static FtpServer ftpServer;
 
     @Autowired
@@ -100,7 +100,7 @@ public class FtpsRepositoryTest {
     }
 
     @Test
-    protected void testConnectAndDisconnect() {
+    void testConnectAndDisconnect() {
         try {
             ftpsRepository.connect(ftpProperties.getHost(), ftpProperties.getPort(), ftpProperties.getUser(), ftpProperties.getPassword());
             // Assuming there's a method isConnected to check the connection status
@@ -113,7 +113,7 @@ public class FtpsRepositoryTest {
     }
 
     @Test
-    protected void testListDirectories() {
+    void testListDirectories() {
 
         String watchDirectory = ftpHomeDir + "/" + ftpProperties.getWatchDirectory();
 
@@ -145,7 +145,7 @@ public class FtpsRepositoryTest {
     }
 
     @Test
-    protected void testListDirectoriesWithoutconnection() throws NoConnection, LoginDenied, ListingFailed {
+    void testListDirectoriesWithoutconnection() throws NoConnection, LoginDenied, ListingFailed {
         String watchDirectory = ftpHomeDir + "/" + ftpProperties.getWatchDirectory();
 
         new File(watchDirectory).mkdir();
