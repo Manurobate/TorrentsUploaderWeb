@@ -102,9 +102,9 @@ jobs:
           mvn --batch-mode release:prepare release:perform -DreleaseVersion=$NEW_VERSION -DdevelopmentVersion=$NEW_DEV_VERSION
           git push origin main --tags
 
+  # Build the project each time
   build:
     runs-on: ubuntu-latest
-    needs: [ increment_version, release_version ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
