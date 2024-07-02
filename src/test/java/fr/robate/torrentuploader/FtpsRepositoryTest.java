@@ -100,7 +100,7 @@ public class FtpsRepositoryTest {
     }
 
     @Test
-    public void testConnectAndDisconnect() {
+    protected void testConnectAndDisconnect() {
         try {
             ftpsRepository.connect(ftpProperties.getHost(), ftpProperties.getPort(), ftpProperties.getUser(), ftpProperties.getPassword());
             // Assuming there's a method isConnected to check the connection status
@@ -113,7 +113,7 @@ public class FtpsRepositoryTest {
     }
 
     @Test
-    public void testListDirectories() {
+    protected void testListDirectories() {
 
         String watchDirectory = ftpHomeDir + "/" + ftpProperties.getWatchDirectory();
 
@@ -145,13 +145,13 @@ public class FtpsRepositoryTest {
     }
 
     @Test
-    public void testListDirectoriesWithoutconnection() throws NoConnection, LoginDenied, ListingFailed {
+    protected void testListDirectoriesWithoutconnection() throws NoConnection, LoginDenied, ListingFailed {
         String watchDirectory = ftpHomeDir + "/" + ftpProperties.getWatchDirectory();
 
         new File(watchDirectory).mkdir();
 
         Exception exception = assertThrows(NoConnection.class, () -> {
-            FTPFile[] directories = ftpsRepository.listDirectories(ftpProperties.getWatchDirectory());
+            ftpsRepository.listDirectories(ftpProperties.getWatchDirectory());
         });
 
         assertSame(exception.getClass(), NoConnection.class);
