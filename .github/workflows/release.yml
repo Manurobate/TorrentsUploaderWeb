@@ -32,7 +32,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${{ github.event.inputs.new_version }} -DdevelopmentVersion=${{ github.event.inputs.new_dev_version }}
+          NEW_VERSION=$(jq -r '.workflow_run.outputs.new_version' "$GITHUB_EVENT_PATH")
+          NEW_DEV_VERSION=$(jq -r '.workflow_run.outputs.new_dev_version' "$GITHUB_EVENT_PATH")
+          mvn --batch-mode release:prepare release:perform -DreleaseVersion=$NEW_VERSION -DdevelopmentVersion=$NEW_DEV_VERSION
           git push origin HEAD --tags
 
 #  docker:
