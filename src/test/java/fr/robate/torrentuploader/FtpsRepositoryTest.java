@@ -81,6 +81,9 @@ class FtpsRepositoryTest {
         ftpServer = serverFactory.createServer();
         ftpServer.start();
 
+        log.debug("Waiting 2 seconds to be sure the server is fully started");
+        Awaitility.await().atMost(2, TimeUnit.SECONDS).until(() -> true);
+
         log.debug("FTP server started on port {}", ftpProperties.getPort());
     }
 
