@@ -9,7 +9,7 @@
     </parent>
     <groupId>fr.robate</groupId>
     <artifactId>torrentsUploaderWeb</artifactId>
-    <version>0.3.51-SNAPSHOT</version>
+    <version>0.3.53-SNAPSHOT</version>
     <name>Torrents Uploader Web</name>
     <description>Upload torrent files on a ftp server to automaticaly start download</description>
     <properties>

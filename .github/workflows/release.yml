@@ -36,12 +36,12 @@ jobs:
 
       - name: Debug Version Variables
         run: |
-          echo "NEW_VERSION=$NEW_VERSION"
-            echo "NEW_DEV_VERSION=$NEW_DEV_VERSION"
+          echo "NEW_VERSION=${{ env.new_version }}"
+            echo "NEW_DEV_VERSION=${{ env.new_dev_version }}"
 
       - name: Perform release
         run: |
-          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${NEW_VERSION} -DdevelopmentVersion=${NEW_DEV_VERSION}
+          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${{ env.new_version }} -DdevelopmentVersion=${{ env.new_dev_version }}
           git push origin HEAD --tags
 
 #  docker:
