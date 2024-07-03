@@ -15,6 +15,7 @@ import org.apache.ftpserver.ssl.SslConfigurationFactory;
 import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 import org.apache.ftpserver.usermanager.impl.BaseUser;
 import org.apache.ftpserver.usermanager.impl.WritePermission;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -127,6 +129,10 @@ class FtpsRepositoryTest {
             ftpsRepository.connect(ftpProperties.getHost(), ftpProperties.getPort(), ftpProperties.getUser(), ftpProperties.getPassword());
             // Assuming there's a method isConnected to check the connection status
             assertTrue(ftpsRepository.isConnected(), "Should be connected to the FTP server");
+
+            log.debug("Waiting 2 seconds before disconnect");
+            Awaitility.await().atMost(2, TimeUnit.SECONDS).until(() -> true);
+
             ftpsRepository.disconnect();
             assertFalse(ftpsRepository.isConnected(), "Should be disconnected from the FTP server");
         } catch (Exception e) {
