@@ -28,20 +28,34 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
 
-      - name: Retrieve new version from environment files
+      - name: Download Version Files
+        uses: actions/download-artifact@v2
+        with:
+          name: version-files
+          path: .
+
+      - name: Read Version from File
+        id: read_version
         run: |
-          echo "NEW_VERSION=$(cat $GITHUB_ENV | grep NEW_VERSION | cut -d '=' -f 2)" >> $GITHUB_ENV
-          echo "NEW_DEV_VERSION=$(cat $GITHUB_ENV | grep NEW_DEV_VERSION | cut -d '=' -f 2)" >> $GITHUB_ENV
-        shell: bash
+          NEW_VERSION=$(cat new_version.txt | grep new_version | cut -d '=' -f 2)
+          NEW_DEV_VERSION=$(cat new_version.txt | grep new_dev_version | cut -d '=' -f 2)
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "NEW_DEV_VERSION=$NEW_DEV_VERSION" >> $GITHUB_ENV
 
       - name: Debug Version Variables
+        env:
+          NEW_VERSION: ${{ env.NEW_VERSION }}
+          NEW_DEV_VERSION: ${{ env.NEW_DEV_VERSION }}
         run: |
-          echo "NEW_VERSION=${{ env.new_version }}"
-            echo "NEW_DEV_VERSION=${{ env.new_dev_version }}"
+          echo "NEW_VERSION=${{ env.NEW_VERSION }}"
+          echo "NEW_DEV_VERSION=${{ env.NEW_DEV_VERSION }}"
 
       - name: Perform release
+        env:
+          NEW_VERSION: ${{ env.NEW_VERSION }}
+          NEW_DEV_VERSION: ${{ env.NEW_DEV_VERSION }}
         run: |
-          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${{ env.new_version }} -DdevelopmentVersion=${{ env.new_dev_version }}
+          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${{ env.NEW_VERSION }} -DdevelopmentVersion=${{ env.NEW_DEV_VERSION }}
           git push origin HEAD --tags
 
 #  docker:
