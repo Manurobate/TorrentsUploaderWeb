@@ -48,7 +48,7 @@ class FtpsRepositoryTest {
     @BeforeAll
     public static void setUp(@Autowired FtpProperties ftpProperties) throws Exception {
         ftpHomeDir = Files.createTempDirectory("ftproot");
-        log.debug("Using temporary directory for FTP home: {}", ftpHomeDir.toString());
+        log.debug("Using temporary directory for FTP home : {}", ftpHomeDir.toString());
 
         // Set up the FTP server
         FtpServerFactory serverFactory = new FtpServerFactory();
