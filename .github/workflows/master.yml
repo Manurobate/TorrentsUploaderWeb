@@ -30,7 +30,7 @@ jobs:
         run: mvn install -DskipTests
 
       - name: Run tests
-        run: timeout 10m mvn test
+        run: mvn test -Dparallel=none
 
       - name: Package the application
         run: mvn package -DskipTests
