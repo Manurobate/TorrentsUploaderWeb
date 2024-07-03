@@ -106,12 +106,16 @@ class FtpsRepositoryTest {
         // Ensure the repository is disconnected before each test
         try {
             if (ftpsRepository.isConnected()) {
+                log.debug("FTP repository is already connected. Disconnecting...");
                 ftpsRepository.disconnect();
+                log.debug("Disconnected");
+            } else {
+                log.debug("Not connected");
             }
         } catch (Exception e) {
             log.warn("Error during init disconnect: {}", e.getMessage());
         }
-        
+
         log.debug("End init test isConnected");
     }
 
