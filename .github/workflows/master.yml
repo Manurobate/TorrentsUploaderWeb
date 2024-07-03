@@ -3,9 +3,11 @@ name: CI/CD Pipeline master
 on:
   pull_request:
     types: [ closed ]
+    branches:
+      - master
 
 jobs:
-  # Build the project after increment_version or release_version
+  # Build the project
   build:
     runs-on: ubuntu-latest
     steps:
@@ -35,6 +37,7 @@ jobs:
       - name: Package the application
         run: mvn package -DskipTests
 
+  # Release version
   release_version:
     runs-on: ubuntu-latest
     needs: build
