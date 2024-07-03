@@ -28,18 +28,20 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
 
-      - name: Get new version from environment
-        id: get_new_version
+      - name: Retrieve new version from environment files
         run: |
-          echo "NEW_VERSION=$(jq -r '.workflow_run.outputs.new_version' "$GITHUB_EVENT_PATH")" >> $GITHUB_ENV
-          echo "NEW_DEV_VERSION=$(jq -r '.workflow_run.outputs.new_dev_version' "$GITHUB_EVENT_PATH")" >> $GITHUB_ENV
+          echo "NEW_VERSION=$(cat $GITHUB_ENV | grep NEW_VERSION | cut -d '=' -f 2)" >> $GITHUB_ENV
+          echo "NEW_DEV_VERSION=$(cat $GITHUB_ENV | grep NEW_DEV_VERSION | cut -d '=' -f 2)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Debug Version Variables
+        run: |
+          echo "NEW_VERSION=$NEW_VERSION"
+            echo "NEW_DEV_VERSION=$NEW_DEV_VERSION"
 
       - name: Perform release
-        env:
-          NEW_VERSION: ${{ env.NEW_VERSION }}
-          NEW_DEV_VERSION: ${{ env.NEW_DEV_VERSION }}
         run: |
-          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${{ env.NEW_VERSION }} -DdevelopmentVersion=${{ env.NEW_DEV_VERSION }}
+          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${NEW_VERSION} -DdevelopmentVersion=${NEW_DEV_VERSION}
           git push origin HEAD --tags
 
 #  docker:
