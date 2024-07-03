@@ -36,11 +36,10 @@ jobs:
 
       - name: Perform release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NEW_VERSION: ${{ env.NEW_VERSION }}
           NEW_DEV_VERSION: ${{ env.NEW_DEV_VERSION }}
         run: |
-          mvn --batch-mode release:prepare release:perform -DreleaseVersion=$NEW_VERSION -DdevelopmentVersion=$NEW_DEV_VERSION
+          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${{ env.NEW_VERSION }} -DdevelopmentVersion=${{ env.NEW_DEV_VERSION }}
           git push origin HEAD --tags
 
 #  docker:

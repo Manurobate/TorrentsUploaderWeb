@@ -2,10 +2,10 @@ name: Enforce Mandatory Labels
 
 on:
   pull_request:
-    types: [ opened, synchronize, reopened, labeled, unlabeled ]
+    types: [ opened, reopened ]
     branches:
       - master
-      
+
 jobs:
   label_check:
     runs-on: ubuntu-latest
