@@ -1,4 +1,4 @@
-name: CI/CD Pipeline develop
+name: Workflow develop
 
 on:
   push:
