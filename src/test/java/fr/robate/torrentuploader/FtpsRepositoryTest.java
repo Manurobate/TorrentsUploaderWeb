@@ -1,7 +1,6 @@
 package fr.robate.torrentuploader;
 
 import fr.robate.torrentuploader.configuration.FtpProperties;
-import fr.robate.torrentuploader.exception.NetworkError;
 import fr.robate.torrentuploader.exception.NoConnection;
 import fr.robate.torrentuploader.repository.FtpsRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,6 @@ import org.apache.ftpserver.usermanager.impl.BaseUser;
 import org.apache.ftpserver.usermanager.impl.WritePermission;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -103,20 +101,22 @@ class FtpsRepositoryTest {
         log.debug("FTP server stopped and temporary directory cleaned up.");
     }
 
-    @BeforeEach
-    public void init() throws NetworkError {
-        // Ensure the repository is disconnected before each test
-        try {
-            if (ftpsRepository.isConnected()) {
-                ftpsRepository.disconnect();
-            }
-        } catch (Exception e) {
-            log.warn("Error during init disconnect: {}", e.getMessage());
-        }
-    }
+//    @BeforeEach
+//    public void init() throws NetworkError {
+//        // Ensure the repository is disconnected before each test
+//        try {
+//            if (ftpsRepository.isConnected()) {
+//                ftpsRepository.disconnect();
+//            }
+//        } catch (Exception e) {
+//            log.warn("Error during init disconnect: {}", e.getMessage());
+//        }
+//    }
 
     @Test
     void testConnectAndDisconnect() {
+        log.debug("Begin testConnectAndDisconnect");
+
         try {
             ftpsRepository.connect(ftpProperties.getHost(), ftpProperties.getPort(), ftpProperties.getUser(), ftpProperties.getPassword());
             // Assuming there's a method isConnected to check the connection status
@@ -126,10 +126,13 @@ class FtpsRepositoryTest {
         } catch (Exception e) {
             fail("Exception thrown during connect/disconnect test: " + e.getMessage());
         }
+
+        log.debug("End testConnectAndDisconnect");
     }
 
     @Test
     void testListDirectories() {
+        log.debug("Begin testListDirectories");
 
         String watchDirectory = ftpHomeDir.resolve(ftpProperties.getWatchDirectory()).toString();
 
@@ -158,13 +161,18 @@ class FtpsRepositoryTest {
             e.printStackTrace();
             fail("Exception thrown during listDirectories test: " + e.getMessage());
         }
+
+        log.debug("End testListDirectories");
     }
 
     @Test
-    void testListDirectoriesWithoutconnection() {
+    void testListDirectoriesWithoutConnection() {
+        log.debug("Begin testListDirectoriesWithoutConnection");
 
         Exception exception = assertThrows(NoConnection.class, () -> ftpsRepository.listDirectories(ftpProperties.getWatchDirectory()));
 
         assertSame(exception.getClass(), NoConnection.class);
+
+        log.debug("End testListDirectoriesWithoutConnection");
     }
 }
