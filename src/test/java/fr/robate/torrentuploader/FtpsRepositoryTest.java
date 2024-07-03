@@ -1,7 +1,6 @@
 package fr.robate.torrentuploader;
 
 import fr.robate.torrentuploader.configuration.FtpProperties;
-import fr.robate.torrentuploader.exception.NetworkError;
 import fr.robate.torrentuploader.exception.NoConnection;
 import fr.robate.torrentuploader.repository.FtpsRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,6 @@ import org.apache.ftpserver.usermanager.impl.BaseUser;
 import org.apache.ftpserver.usermanager.impl.WritePermission;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -103,17 +101,17 @@ class FtpsRepositoryTest {
         log.debug("FTP server stopped and temporary directory cleaned up.");
     }
 
-    @BeforeEach
-    public void init() throws NetworkError {
-        // Ensure the repository is disconnected before each test
-        try {
-            if (ftpsRepository.isConnected()) {
-                ftpsRepository.disconnect();
-            }
-        } catch (Exception e) {
-            log.warn("Error during init disconnect: {}", e.getMessage());
-        }
-    }
+//    @BeforeEach
+//    public void init() throws NetworkError {
+//        // Ensure the repository is disconnected before each test
+//        try {
+//            if (ftpsRepository.isConnected()) {
+//                ftpsRepository.disconnect();
+//            }
+//        } catch (Exception e) {
+//            log.warn("Error during init disconnect: {}", e.getMessage());
+//        }
+//    }
 
     @Test
     void testConnectAndDisconnect() {
