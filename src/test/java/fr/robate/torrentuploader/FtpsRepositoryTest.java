@@ -1,6 +1,7 @@
 package fr.robate.torrentuploader;
 
 import fr.robate.torrentuploader.configuration.FtpProperties;
+import fr.robate.torrentuploader.exception.NetworkError;
 import fr.robate.torrentuploader.exception.NoConnection;
 import fr.robate.torrentuploader.repository.FtpsRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +17,18 @@ import org.apache.ftpserver.usermanager.impl.BaseUser;
 import org.apache.ftpserver.usermanager.impl.WritePermission;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class FtpsRepositoryTest {
     private static FtpServer ftpServer;
+    private static Path ftpHomeDir;
 
     @Autowired
     private FtpProperties ftpProperties;
@@ -37,10 +44,11 @@ class FtpsRepositoryTest {
     @Autowired
     private FtpsRepository ftpsRepository;
 
-    private static final String ftpHomeDir = "ftproot";
-
     @BeforeAll
     public static void setUp(@Autowired FtpProperties ftpProperties) throws Exception {
+        ftpHomeDir = Files.createTempDirectory("ftproot");
+        log.debug("Using temporary directory for FTP home: {}", ftpHomeDir.toString());
+
         // Set up the FTP server
         FtpServerFactory serverFactory = new FtpServerFactory();
         ListenerFactory factory = new ListenerFactory();
@@ -61,7 +69,7 @@ class FtpsRepositoryTest {
         BaseUser user = new BaseUser();
         user.setName(ftpProperties.getUser());
         user.setPassword(ftpProperties.getPassword());
-        user.setHomeDirectory(ftpHomeDir);
+        user.setHomeDirectory(ftpHomeDir.toString());
 
         List<Authority> authorities = new ArrayList<>();
         authorities.add(new WritePermission());
@@ -72,8 +80,8 @@ class FtpsRepositoryTest {
         ftpServer = serverFactory.createServer();
         ftpServer.start();
 
-        // Create the FTP home directory
-        new File(ftpHomeDir).mkdirs();
+        // Wait for the server to be fully started
+        TimeUnit.SECONDS.sleep(5);
 
         log.debug("FTP server started on port {}", ftpProperties.getPort());
     }
@@ -83,18 +91,24 @@ class FtpsRepositoryTest {
         if (ftpServer != null) {
             ftpServer.stop();
         }
+
         // Clean up the FTP home directory
-        deleteDirectory(new File(ftpHomeDir));
+        try {
+            Files.walk(ftpHomeDir)
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        } catch (IOException e) {
+            log.error("Error cleaning up temporary FTP home directory", e);
+        }
+        log.debug("FTP server stopped and temporary directory cleaned up.");
     }
 
-    private static void deleteDirectory(File directoryToBeDeleted) {
-        File[] allContents = directoryToBeDeleted.listFiles();
-        if (allContents != null) {
-            for (File file : allContents) {
-                deleteDirectory(file);
-            }
+    @BeforeEach
+    public void init() throws NetworkError {
+        // Ensure the repository is disconnected before each test
+        if (ftpsRepository.isConnected()) {
+            ftpsRepository.disconnect();
         }
-        directoryToBeDeleted.delete();
     }
 
     @Test
@@ -113,7 +127,7 @@ class FtpsRepositoryTest {
     @Test
     void testListDirectories() {
 
-        String watchDirectory = ftpHomeDir + "/" + ftpProperties.getWatchDirectory();
+        String watchDirectory = ftpHomeDir.resolve(ftpProperties.getWatchDirectory()).toString();
 
         try {
             ftpsRepository.connect(ftpProperties.getHost(), ftpProperties.getPort(), ftpProperties.getUser(), ftpProperties.getPassword());
@@ -144,9 +158,6 @@ class FtpsRepositoryTest {
 
     @Test
     void testListDirectoriesWithoutconnection() {
-        String watchDirectory = ftpHomeDir + "/" + ftpProperties.getWatchDirectory();
-
-        new File(watchDirectory).mkdir();
 
         Exception exception = assertThrows(NoConnection.class, () -> ftpsRepository.listDirectories(ftpProperties.getWatchDirectory()));
 
