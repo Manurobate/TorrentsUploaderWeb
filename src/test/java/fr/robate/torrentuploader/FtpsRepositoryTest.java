@@ -106,8 +106,12 @@ class FtpsRepositoryTest {
     @BeforeEach
     public void init() throws NetworkError {
         // Ensure the repository is disconnected before each test
-        if (ftpsRepository.isConnected()) {
-            ftpsRepository.disconnect();
+        try {
+            if (ftpsRepository.isConnected()) {
+                ftpsRepository.disconnect();
+            }
+        } catch (Exception e) {
+            log.warn("Error during init disconnect: {}", e.getMessage());
         }
     }
 
