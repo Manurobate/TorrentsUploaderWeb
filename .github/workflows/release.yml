@@ -28,12 +28,18 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
 
+      - name: Get new version from environment
+        id: get_new_version
+        run: |
+          echo "NEW_VERSION=$(jq -r '.workflow_run.outputs.new_version' "$GITHUB_EVENT_PATH")" >> $GITHUB_ENV
+          echo "NEW_DEV_VERSION=$(jq -r '.workflow_run.outputs.new_dev_version' "$GITHUB_EVENT_PATH")" >> $GITHUB_ENV
+
       - name: Perform release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_VERSION: ${{ env.NEW_VERSION }}
+          NEW_DEV_VERSION: ${{ env.NEW_DEV_VERSION }}
         run: |
-          NEW_VERSION=$(jq -r '.workflow_run.outputs.new_version' "$GITHUB_EVENT_PATH")
-          NEW_DEV_VERSION=$(jq -r '.workflow_run.outputs.new_dev_version' "$GITHUB_EVENT_PATH")
           mvn --batch-mode release:prepare release:perform -DreleaseVersion=$NEW_VERSION -DdevelopmentVersion=$NEW_DEV_VERSION
           git push origin HEAD --tags
 

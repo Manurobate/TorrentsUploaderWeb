@@ -99,8 +99,8 @@ jobs:
             echo "Invalid release type: $RELEASE_TYPE"
             exit 1
           fi
-          echo "::set-output name=new_version::$NEW_VERSION"
-          echo "::set-output name=new_dev_version::$NEW_DEV_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+          echo "new_dev_version=$NEW_DEV_VERSION" >> $GITHUB_ENV
 
       - name: Create Release Branch
         run: |
