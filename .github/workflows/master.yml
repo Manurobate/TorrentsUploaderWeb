@@ -128,8 +128,8 @@ jobs:
             -d '{"title":"Release version ${{ env.new_version }}","head":"release-branch-${{ env.new_version }}","base":"master"}'
 
   rebase_develop:
+    if: contains(github.event.pull_request.head.ref, 'release-branch-')
     runs-on: ubuntu-last
-    needs: create_release
     steps:
       - name: Rebase Develop onto Master
         run: |
@@ -137,31 +137,3 @@ jobs:
           git checkout develop
           git rebase origin/master
           git push origin develop --force
-          
-#  update_develop:
-#    runs-on: ubuntu-latest
-#    needs: create_release
-#    steps:
-#      - name: Check out code
-#        uses: actions/checkout@v4
-#        with:
-#          ref: develop
-#
-#      - name: Set up JDK 21
-#        uses: actions/setup-java@v4
-#        with:
-#          distribution: 'temurin'
-#          java-version: '21'
-#
-#      - name: Configure Git
-#        run: |
-#          git config --global user.name 'github-actions[bot]'
-#          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-#          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-#
-#      - name: Update Development Version
-#        run: |
-#          mvn versions:set -DnewVersion=${{ needs.create_release.outputs.new_dev_version }}
-#          git add pom.xml
-#          git commit -m "Set development version to ${{ needs.create_release.outputs.new_dev_version }}"
-#          git push origin develop
