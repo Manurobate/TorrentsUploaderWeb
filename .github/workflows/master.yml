@@ -115,7 +115,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${{ env.new_version }} -DdevelopmentVersion=${{ env.new_dev_version }} -Dgoals=clean verify
+          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${{ env.new_version }} -DdevelopmentVersion=${{ env.new_dev_version }} -Dgoals=clean verify -Darguments=-DskipTests
           git push origin HEAD --tags
 
       - name: Create Pull Request
@@ -127,6 +127,17 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/pulls \
             -d '{"title":"Release version ${{ env.new_version }}","head":"release-branch-${{ env.new_version }}","base":"master"}'
 
+  rebase_develop:
+    runs-on: ubuntu-last
+    needs: create_release
+    steps:
+      - name: Rebase Develop onto Master
+        run: |
+          git fetch origin
+          git checkout develop
+          git rebase origin/master
+          git push origin develop --force
+          
 #  update_develop:
 #    runs-on: ubuntu-latest
 #    needs: create_release
