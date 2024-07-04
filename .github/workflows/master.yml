@@ -115,7 +115,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${{ env.new_version }} -DdevelopmentVersion=${{ env.new_dev_version }}
+          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${{ env.new_version }} -DdevelopmentVersion=${{ env.new_dev_version }} -Dgoals=clean verify
           git push origin HEAD --tags
 
       - name: Create Pull Request
