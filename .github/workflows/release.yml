@@ -28,11 +28,17 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
 
+      - name: Read Version Info
+        id: read_version
+        run: |
+          NEW_VERSION=$(cat .release_version)
+          NEW_DEV_VERSION=$(cat .release_dev_version)
+          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+          echo "new_dev_version=$NEW_DEV_VERSION" >> $GITHUB_ENV
+
       - name: Perform release
         run: |
-          NEW_VERSION=$(jq -r '.workflow_run.outputs.new_version' "$GITHUB_EVENT_PATH")
-          NEW_DEV_VERSION=$(jq -r '.workflow_run.outputs.new_dev_version' "$GITHUB_EVENT_PATH")
-          mvn --batch-mode release:prepare release:perform -DreleaseVersion=$NEW_VERSION -DdevelopmentVersion=$NEW_DEV_VERSION
+          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${{ env.new_version }} -DdevelopmentVersion=${{ env.new_dev_version }}
           git push origin HEAD --tags
 
 #  docker:

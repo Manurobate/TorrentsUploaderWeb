@@ -99,16 +99,18 @@ jobs:
             echo "Invalid release type: $RELEASE_TYPE"
             exit 1
           fi
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "new_dev_version=$NEW_DEV_VERSION" >> $GITHUB_OUTPUT
+          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+          echo "new_dev_version=$NEW_DEV_VERSION" >> $GITHUB_ENV
+          echo "$NEW_VERSION" > .release_version
+          echo "$NEW_DEV_VERSION" > .release_dev_version
 
       - name: Create Release Branch
         run: |
-          git checkout -b release-branch-${{ steps.determine_version.outputs.new_version }}
-          mvn versions:set -DnewVersion=${{ steps.determine_version.outputs.new_version }}
-          git add pom.xml
-          git commit -m "Set version to ${{ steps.determine_version.outputs.new_version }}"
-          git push origin release-branch-${{ steps.determine_version.outputs.new_version }}
+          git checkout -b release-branch-${{ env.new_version }}
+          mvn versions:set -DnewVersion=${{ env.new_version }}
+          git add pom.xml .release_version .release_dev_version
+          git commit -m "Set version to ${{ env.new_version }}"
+          git push origin release-branch-${{ env.new_version }}
 
       - name: Create Pull Request
         env:
