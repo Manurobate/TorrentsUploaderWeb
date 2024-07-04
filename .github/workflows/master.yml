@@ -107,7 +107,7 @@ jobs:
         run: |
           git checkout -b release-branch-${{ env.new_version }}
           mvn versions:set -DnewVersion=${{ env.new_version }}
-          git add pom.xml .release_version .release_dev_version
+          git add pom.xml
           git commit -m "Set version to ${{ env.new_version }}"
           git push origin release-branch-${{ env.new_version }}
 
