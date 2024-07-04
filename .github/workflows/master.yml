@@ -5,12 +5,11 @@ on:
     types: [ closed ]
     branches:
       - master
-    paths:
-      - 'develop/**'
 
 jobs:
   # Build the project
   build:
+    if: github.event.pull_request.head.ref == 'develop'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
