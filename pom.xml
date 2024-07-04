@@ -9,7 +9,7 @@
     </parent>
     <groupId>fr.robate</groupId>
     <artifactId>torrentsUploaderWeb</artifactId>
-    <version>0.4.4-SNAPSHOT</version>
+    <version>0.4.4</version>
     <name>Torrents Uploader Web</name>
     <description>Upload torrent files on a ftp server to automaticaly start download</description>
     <properties>
@@ -67,7 +67,7 @@
         <connection>scm:git:https://github.com/Manurobate/TorrentsUploaderWeb.git</connection>
         <developerConnection>scm:git:https://github.com/Manurobate/TorrentsUploaderWeb.git</developerConnection>
         <url>https://github.com/Manurobate/TorrentsUploaderWeb</url>
-        <tag>HEAD</tag>
+        <tag>torrentsUploaderWeb-0.4.4</tag>
     </scm>
 
     <build>
