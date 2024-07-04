@@ -28,34 +28,11 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
 
-      - name: Download Version Files
-        uses: actions/download-artifact@v2
-        with:
-          name: version-files
-          path: .
-
-      - name: Read Version from File
-        id: read_version
-        run: |
-          NEW_VERSION=$(cat new_version.txt | grep new_version | cut -d '=' -f 2)
-          NEW_DEV_VERSION=$(cat new_version.txt | grep new_dev_version | cut -d '=' -f 2)
-          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-          echo "NEW_DEV_VERSION=$NEW_DEV_VERSION" >> $GITHUB_ENV
-
-      - name: Debug Version Variables
-        env:
-          NEW_VERSION: ${{ env.NEW_VERSION }}
-          NEW_DEV_VERSION: ${{ env.NEW_DEV_VERSION }}
-        run: |
-          echo "NEW_VERSION=${{ env.NEW_VERSION }}"
-          echo "NEW_DEV_VERSION=${{ env.NEW_DEV_VERSION }}"
-
       - name: Perform release
-        env:
-          NEW_VERSION: ${{ env.NEW_VERSION }}
-          NEW_DEV_VERSION: ${{ env.NEW_DEV_VERSION }}
         run: |
-          mvn --batch-mode release:prepare release:perform -DreleaseVersion=${{ env.NEW_VERSION }} -DdevelopmentVersion=${{ env.NEW_DEV_VERSION }}
+          NEW_VERSION=$(jq -r '.workflow_run.outputs.new_version' "$GITHUB_EVENT_PATH")
+          NEW_DEV_VERSION=$(jq -r '.workflow_run.outputs.new_dev_version' "$GITHUB_EVENT_PATH")
+          mvn --batch-mode release:prepare release:perform -DreleaseVersion=$NEW_VERSION -DdevelopmentVersion=$NEW_DEV_VERSION
           git push origin HEAD --tags
 
 #  docker:
