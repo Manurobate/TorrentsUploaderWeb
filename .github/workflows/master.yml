@@ -150,5 +150,5 @@ jobs:
         run: |
           git fetch origin
           git checkout develop
-          git rebase origin/master
+          git rebase origin/master --strategy-option=ours
           git push origin develop --force
