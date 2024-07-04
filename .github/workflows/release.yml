@@ -17,6 +17,28 @@ jobs:
           ref: ${{ github.event.workflow_run.head_branch }}
           fetch-depth: 0
 
+      - name: Display current branch and files
+        run: |
+          echo "Current branch:"
+          git branch --show-current
+          echo "Files in working directory:"
+          ls -al
+
+      - name: Check if version files exist
+        run: |
+          if [ -f .release_version ]; then
+            echo ".release_version file exists"
+          else
+            echo ".release_version file does not exist"
+            exit 1
+          fi
+          if [ -f .release_dev_version ]; then
+            echo ".release_dev_version file exists"
+          else
+            echo ".release_dev_version file does not exist"
+            exit 1
+          fi
+          
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
