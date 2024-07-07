@@ -33,6 +33,8 @@ public class FtpService {
         FTPFile[] tFolders = ftpsRepository.listDirectories(props.getWatchDirectory());
         List<String> directoryNames = new ArrayList<>();
 
+        directoryNames.add(".");
+
         for (FTPFile f : tFolders) {
             directoryNames.add(f.getName());
         }
