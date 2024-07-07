@@ -29,7 +29,7 @@
                 <div class="mb-3">
                     <label for="watchFolder" class="form-label">Répertoire de destination</label>
                     <select class="form-select" id="watchFolder" th:field="*{destinationFolder}" required>
-                        <option value="">.</option>
+                        <!--                        <option value="">.</option>-->
                         <option th:each="folder : ${watchFolders}" th:value="${folder}" th:text="${folder}"></option>
                     </select>
                 </div>
