@@ -1,5 +1,6 @@
 package fr.robate.torrentuploader.controller;
 
+import fr.robate.torrentuploader.configuration.FtpProperties;
 import fr.robate.torrentuploader.model.FileToUpload;
 import fr.robate.torrentuploader.service.FtpService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +21,11 @@ public class FtpController {
 
     private final FtpService ftpService;
 
-    public FtpController(FtpService ftpService) {
+    private final FtpProperties ftpProperties;
+
+    public FtpController(FtpService ftpService, FtpProperties ftpProperties) {
         this.ftpService = ftpService;
+        this.ftpProperties = ftpProperties;
     }
 
     @GetMapping("/")
@@ -29,6 +33,7 @@ public class FtpController {
 
         FileToUpload fileModel = new FileToUpload();
         model.addAttribute("fileToUpload", fileModel);
+        model.addAttribute("version", ftpProperties.getVersion());
 
         try {
             List<String> watchFolders = ftpService.listDirectoriesInWatchFolder();
