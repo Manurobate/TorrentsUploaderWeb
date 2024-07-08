@@ -27,7 +27,7 @@
                 </button>
             </div>
 
-            <form method="post" th:action="@{/upload}" th:object="${fileToUpload}" enctype="multipart/form-data">
+            <form method="post" th:action="@{/upload}" th:object="${filesToUpload}" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="torrentFile" class="form-label">Fichier .torrent</label>
                     <input class="form-control" type="file" id="torrentFile" accept=".torrent" th:field="*{files}"
