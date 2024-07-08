@@ -1,7 +1,7 @@
 package fr.robate.torrentuploader.controller;
 
 import fr.robate.torrentuploader.configuration.FtpProperties;
-import fr.robate.torrentuploader.model.FileToUpload;
+import fr.robate.torrentuploader.model.FilesToUpload;
 import fr.robate.torrentuploader.service.FtpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -31,14 +30,15 @@ public class FtpController {
     @GetMapping("/")
     public String displayIndex(Model model) {
 
-        FileToUpload fileModel = new FileToUpload();
-        model.addAttribute("fileToUpload", fileModel);
+        FilesToUpload filesToUpload = new FilesToUpload();
+        model.addAttribute("filesToUpload", filesToUpload);
         model.addAttribute("version", ftpProperties.getVersion());
 
         try {
             List<String> watchFolders = ftpService.listDirectoriesInWatchFolder();
             model.addAttribute("watchFolders", watchFolders);
         } catch (Exception e) {
+            model.addAttribute("msgError", e.getMessage());
             log.error(e.getMessage(), e);
         }
 
@@ -46,33 +46,25 @@ public class FtpController {
     }
 
     @PostMapping("/upload")
-    public ModelAndView uploadTorrent(RedirectAttributes redirectAttributes, @ModelAttribute FileToUpload fileToUpload) {
+    public ModelAndView uploadTorrent(RedirectAttributes redirectAttributes, @ModelAttribute FilesToUpload filesToUpload) {
 
-        List<MultipartFile> files = fileToUpload.getFiles();
-        StringBuilder message = new StringBuilder();
+        StringBuilder msgError = ftpService.checkFilestoUpload(filesToUpload);
 
-        for (MultipartFile file : files) {
-            String filename = file.getOriginalFilename();
+        if (!msgError.isEmpty())
+            redirectAttributes.addFlashAttribute("msgError", msgError);
+        else {
+            StringBuilder msgOk = new StringBuilder();
 
-            if (filename == null) {
-                message.append("Nom de fichier null : ").append("<br>");
-                continue;
+            try {
+                msgOk = ftpService.uploadFichier(filesToUpload);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
             }
 
-            if (filename.toLowerCase().endsWith(".torrent")) {
-                try {
-                    ftpService.uploadFichier(file, fileToUpload.getDestinationFolder());
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            } else {
-                message.append("Fichier non torrent : ").append(filename).append("<br>");
-            }
+            if (!msgOk.isEmpty())
+                redirectAttributes.addFlashAttribute("msgOk", msgOk);
         }
-
-        if (!message.isEmpty())
-            redirectAttributes.addFlashAttribute("msg", message);
-
+        
         return new ModelAndView("redirect:/");
     }
 }
