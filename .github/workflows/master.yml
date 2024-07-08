@@ -152,9 +152,11 @@ jobs:
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/torrentsuploaderweb:latest ${{ secrets.DOCKER_HUB_USERNAME }}/torrentsuploaderweb:${{ env.new_version }} .
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/torrentsuploaderweb:${{ env.new_version }} .
+          docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/torrentsuploaderweb:${{ env.new_version }} ${{ secrets.DOCKER_HUB_USERNAME }}/torrentsuploaderweb:latest
           echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/torrentsuploaderweb:${{ env.new_version }}
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/torrentsuploaderweb:latest
 
   rebase_develop:
     if: contains(github.event.pull_request.head.ref, 'release-branch-')
