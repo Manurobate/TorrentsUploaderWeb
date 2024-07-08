@@ -2,6 +2,7 @@ package fr.robate.torrentuploader.service;
 
 import fr.robate.torrentuploader.configuration.FtpProperties;
 import fr.robate.torrentuploader.exception.*;
+import fr.robate.torrentuploader.model.FileToUpload;
 import fr.robate.torrentuploader.repository.FtpsRepository;
 import lombok.Data;
 import org.apache.commons.net.ftp.FTPFile;
@@ -44,13 +45,20 @@ public class FtpService {
         return directoryNames;
     }
 
-    public void uploadFichier(MultipartFile file, String destFolder) throws IOException, NetworkError, NoConnection, LoginDenied, UploadFailed, IncorrectFile, DirectoryNotFound {
+    public StringBuilder uploadFichier(FileToUpload fileToUpload) throws IOException, NetworkError, NoConnection, LoginDenied, UploadFailed, IncorrectFile, DirectoryNotFound {
+        StringBuilder msgOk = new StringBuilder();
+
         ftpsRepository = new FtpsRepository();
 
         ftpsRepository.connect(props.getHost(), props.getPort(), props.getUser(), props.getPassword());
 
-        ftpsRepository.uploadFile(file.getInputStream(), "watch/" + destFolder, file.getOriginalFilename());
+        for (MultipartFile file : fileToUpload.getFiles()) {
+            ftpsRepository.uploadFile(file.getInputStream(), "watch/" + fileToUpload.getDestinationFolder(), file.getOriginalFilename());
+            msgOk.append(file.getOriginalFilename()).append("<br />");
+        }
 
         ftpsRepository.disconnect();
+
+        return msgOk;
     }
 }
