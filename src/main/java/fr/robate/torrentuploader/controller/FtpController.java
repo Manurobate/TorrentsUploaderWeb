@@ -58,13 +58,14 @@ public class FtpController {
             try {
                 msgOk = ftpService.uploadFichier(filesToUpload);
             } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("msgError", e.getMessage());
                 log.error(e.getMessage(), e);
             }
 
             if (!msgOk.isEmpty())
                 redirectAttributes.addFlashAttribute("msgOk", msgOk);
         }
-        
+
         return new ModelAndView("redirect:/");
     }
 }
